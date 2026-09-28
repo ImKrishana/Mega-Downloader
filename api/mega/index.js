@@ -16,10 +16,6 @@ function json(data, status = 200) {
 function safeUrl(value) {
   try { const u = new URL(value); return /^https?:$/.test(u.protocol) && /(^|\.)mega\.nz$/i.test(u.hostname) ? u.toString() : null; } catch { return null; }
 }
-function auth(request) {
-  const expected = process.env.API_KEY;
-  return !expected || request.headers.get("x-api-key") === expected || request.headers.get("authorization") === `Bearer ${expected}`;
-}
 async function upstream(path, init = {}) {
   const r = await fetch(`${UPSTREAM}${path}`, { ...init, headers: { accept: "application/json", ...(init.headers || {}) } });
   const text = await r.text(); let body; try { body = text ? JSON.parse(text) : null; } catch { body = { error: text }; }
@@ -53,7 +49,6 @@ function idFrom(body) { return body?.id || body?.job_id; }
 
 export async function GET(request) {
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405);
-  if (!auth(request)) return json({ error: "unauthorized" }, 401);
   const input = new URL(request.url, "https://vercel.local").searchParams.get("url");
   const megaUrl = safeUrl(input);
   if (!megaUrl) return json({ error: "invalid_url", message: "Provide a valid mega.nz file or folder URL. Encode # as %23 in the query string." }, 400);
