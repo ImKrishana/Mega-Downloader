@@ -2,6 +2,14 @@ const UPSTREAM = (process.env.UPSTREAM_API_BASE || "https://clonr.co/api").repla
 const TERMINAL = new Set(["completed", "partial", "failed", "expired"]);
 const MAX_WAIT_MS = Math.min(Number(process.env.MAX_WAIT_MS || 20000), 25000);
 
+function effectiveState(x) {
+  const total = Number(x?.total_files ?? 0);
+  const completed = Number(x?.completed_files ?? 0);
+  const failed = Number(x?.failed_files ?? 0);
+  if (x?.cache_state === "completed" || (x?.zip_url && total > 0 && completed >= total && failed === 0)) return "completed";
+  return x?.state || x?.cache_state || "unknown";
+}
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
 }
@@ -22,7 +30,7 @@ function metadata(x, fallbackId) {
   const files = Array.isArray(x?.files) ? x.files : [];
   return {
     job_id: x?.id || fallbackId,
-    state: x?.state || x?.cache_state || "unknown",
+    state: effectiveState(x),
     name: x?.name || null,
     total_files: x?.total_files ?? files.length,
     total_size: x?.total_size ?? null,
@@ -56,12 +64,12 @@ export async function GET(request) {
     if (!cached) await upstream(`/clone/${encodeURIComponent(id)}/start`, { method: "POST" });
     let status = await upstream(`/clone/${encodeURIComponent(id)}`);
     const deadline = Date.now() + MAX_WAIT_MS;
-    while (!TERMINAL.has(status?.state) && Date.now() < deadline) {
+    while (!TERMINAL.has(effectiveState(status)) && Date.now() < deadline) {
       await new Promise(r => setTimeout(r, 1000));
       const states = await upstream("/clone/states", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ids: [id] }) });
       const brief = states?.states?.[id];
       if (brief?.state) status = { ...status, ...brief };
-      if (TERMINAL.has(status?.state)) break;
+      if (TERMINAL.has(effectiveState(status))) break;
       status = await upstream(`/clone/${encodeURIComponent(id)}`);
     }
     const result = metadata(status, id);
