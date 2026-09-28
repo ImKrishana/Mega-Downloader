@@ -1,6 +1,8 @@
-# Mega Direct Link Generator
+## Mega Direct Link Generator
 
 **Simple API to generate direct download links from MEGA files and folders.**
+
+**[Live Demo](https://megadl.the-zake.workers.dev/)**
 
 ## API Usage
 
