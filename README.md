@@ -160,7 +160,6 @@ console.log(result.zip_url);
 
 <strong>◤𝑺 𝑨 𝑻  𝒀 𝑨 𝑴 ◢</strong> · <a href="https://github.com/ftsatyam">@ftsatyam</a>
 
-<strong>Reference</strong> · <a href="https://clonr.co">clonr</a>
 
 </div>
 
