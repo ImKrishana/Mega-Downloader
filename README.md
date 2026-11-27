@@ -152,22 +152,6 @@ console.log(result.zip_url);
 
 </details>
 
-## Local Development
-
-```bash
-npm start
-```
-Starts local server at `http://localhost:3000`.
-
-## Standalone Python Edition
-
-A pure Python 3 implementation with identical API support is available in the [`python/`](./python) directory:
-```bash
-cd python
-pip install -r requirements.txt
-python server.py
-```
-
 ## Credits
 
 <div align="center">
@@ -175,6 +159,7 @@ python server.py
 <strong>K R I $ H A N A</strong> · <a href="https://github.com/ImKrishana">@ImKrishana</a>
 
 <strong>◤𝑺 𝑨 𝑻  𝒀 𝑨 𝑴 ◢</strong> · <a href="https://github.com/ftsatyam">@ftsatyam</a>
+
 
 </div>
 
